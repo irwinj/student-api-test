@@ -1,11 +1,12 @@
 class StudentInfoApi
 
-  def self.apiquery
+  def self.apiquery(firstName, lastName, dob, last4)
     require 'rubygems'
     require 'json'
     require 'uri'
     require 'net/http'
 
+    # Compose general stuff about API post
     url = URI("https://api.myseiubenefits.org/findname")
 
     http = Net::HTTP.new(url.host, url.port)
@@ -16,12 +17,17 @@ class StudentInfoApi
     request["content-type"] = 'application/x-www-form-urlencoded'
     request["cache-control"] = 'no-cache'
     request["postman-token"] = 'c80f4017-0aec-4b0a-fd4d-f9ba6f9b9b4e'
-    request.body = "firstName=TROY&lastName=CORNYN&dob=1973-08-28&last4=0058"
 
+    # Compose specific query
+    request.body = "firstName=#{firstName}&lastName=#{lastName}&dob=#{dob}&last4=#{last4}"
+
+    # Make query
     response = http.request(request)
 
     parsed = JSON.parse(response.read_body)
     student = parsed['student'][0]
+
+    # Create object representing a student
     StudentInfoApi.new(student['firstname'],
                        student['lastname'],
                        student['compliance_status'],
